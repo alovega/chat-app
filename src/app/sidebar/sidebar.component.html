@@ -1,0 +1,111 @@
+<div id="sidebar" class="contacts" style="z-index: 1;" [hidden]="isShown">
+  <div id="row1">
+    <div id="sidebarHeader" style="background-color: #2a9688;">
+      <div class="avatarContainer" (click)="toggleClass()">
+        <img class="back" src="../../assets/images/left-back.svg" />
+        <p>{{currentuser}}</p>
+      </div>
+      <div class="actionsContainer">
+        <img src="../../assets/images/logout.svg" style="width: 20px;" (click)="logout()" />
+      </div>
+    </div>
+    <div id="searchBox">
+      <img width="19" src="../../assets/images/searchIcon.svg" />
+      <input
+        [(ngModel)]="searchText"
+        type="text"
+        placeholder="Search contacts"
+      />
+    </div>
+  </div>
+
+  <div id="sidebarContent">
+    <!-- <div id="noConversations">All chats are archived</div> -->
+
+    <div
+      class="conversation"
+      *ngFor="
+        let user of !searchText ? users : filteredContacts
+      "
+      (click)="contactClicked.emit(user)"
+      (click)="toggleClass()"
+    >
+      <div class="picture">
+        <img src="../../assets/images/noPic.svg" />
+      </div>
+      <div class="content">
+        <div class="conversationHeader">
+          <div class="name">{{ user.username }}</div>
+          <!-- <div class="time">{{ conversation.time }}</div> -->
+        </div>
+        <div class="message">
+          <img
+            *ngIf="!user.username"
+            src="../../assets/images/doubleTick.svg"
+          />
+          <img
+            *ngIf="user.username"
+            src="../../assets/images/doubleTickBlue.svg"
+          />
+          {{ user.id }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="sidebar">
+  <div id="row1">
+    <div id="sidebarHeader">
+      <div class="avatarContainer">
+        <img src="../../assets/images/noPic.svg" />
+        <p>{{currentuser}}</p>
+      </div>
+      <div class="actionsContainer">
+        <img src="../../assets/images/statusIcon.svg" />
+        <img src="../../assets/images/chatIcon.svg" (click)="toggleClass()" />
+        <img src="../../assets/images/logout.svg" style="width: 20px;" (click)="logout()" />
+      </div>
+    </div>
+    <div id="searchBox">
+      <img width="19" src="../../assets/images/searchIcon.svg" />
+      <input
+        [(ngModel)]="searchText"
+        type="text"
+        placeholder="Search or start the new chat"
+      />
+    </div>
+  </div>
+  <div id="sidebarContent">
+    <!-- <div id="noConversations">All chats are archived</div> -->
+
+    <div
+      class="conversation"
+      *ngFor="
+        let userRoom of !searchText ? roomList : filteredRooms
+      "
+      (click)="conversationClicked.emit(userRoom)"
+    >
+      <div class="picture">
+        <img src="../../assets/images/noPic.svg" />
+      </div>
+      <div class="content">
+        <div class="conversationHeader">
+          <div class="name">{{ userRoom.name }}</div>
+          <!-- <div class="time">{{ conversation.time }}</div> -->
+        </div>
+        <div class="message">
+          <img
+            *ngIf="!userRoom.name"
+            src="../../assets/images/doubleTick.svg"
+          />
+          <img
+            *ngIf="userRoom.name"
+            src="../../assets/images/doubleTickBlue.svg"
+          />
+          {{ userRoom.roomId }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
