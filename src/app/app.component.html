@@ -1,5 +1,5 @@
-<router-outlet>
-  <div id="background_header"></div>
+
+<div id="background_header"></div>
 <div id="background_body"></div>
 <div id="chatContainer" *ngIf="rooms">
   <app-sidebar
@@ -19,7 +19,8 @@
 
       <p>WhatsApp is available for Mac. <a href="#">Get it here</a></p>
     </div>
-    <app-chat [user]="user" [userRoom]="userRoom"  *ngIf="userRoom"></app-chat>
+    <!-- <app-chat [user]="user" [userRoom]="userRoom"  *ngIf="userRoom"></app-chat> -->
+    <router-outlet></router-outlet>
   </div>
 </div>
-</router-outlet>
+<router-outlet></router-outlet>

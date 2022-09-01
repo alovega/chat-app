@@ -1,6 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import * as io from 'socket.io-client';
-import { environment } from 'src/environments/environment';
 import { ChatroomService } from './services/chatroom.service';
 import { SocketService } from './services/socket.service';
 
@@ -13,13 +11,18 @@ export class AppComponent implements OnInit{
   title = 'chat';
   user;
   userRoom;
-  rooms:{roomId:string, recipientId: string, initiatorId:string, initiator:string, recipient:string, messages:any[], name:string}[]=[]
+  rooms:any
+  currentRooms:any[] = []
   constructor(private socket: SocketService, private room: ChatroomService){
+    this.socket.rooms.subscribe((data) => {
+      console.log("data-rooms", data)
+      this.rooms = data;
+    })
     this.room.getRooms().subscribe(response => {
       if(response.success){
         response.payload.forEach(data =>{
           console.log(data)
-          let roomData={
+          let roomData = {
             roomId: data.id,
             recipientId: data.recipientId,
             initiatorId: data.profileId,
@@ -29,9 +32,11 @@ export class AppComponent implements OnInit{
             username: sessionStorage.getItem('username'),
             name: sessionStorage.getItem('username') === data.recipient.user.username ? data.chatInitiator.user.username: data.recipient.user.username
           }
+          this.currentRooms.push(roomData)
           this.socket.createRoom(roomData)
-          this.rooms.push(roomData)
+          this.UserRooms()
         })
+        this.socket.rooms.next(this.currentRooms)
       }
     })
   }
@@ -43,7 +48,6 @@ export class AppComponent implements OnInit{
     let data = {recipientId: user.userId}
     this.room.initiateRoom(data).subscribe(response => {
       if(response.success){
-        console.log("app level", response)
         let roomData = {
           roomId: response.payload.id,
           recipientId: response.payload.recipientId,
@@ -53,13 +57,12 @@ export class AppComponent implements OnInit{
           currentUser: sessionStorage.getItem('username')
         }
         this.socket.createRoom(roomData)
-
+        this.socket.getUserRooms({userId:sessionStorage.getItem('userId')})
       }
     })
     this.user = user;
   }
   onConversationSelected(userRoom){
-    console.log("room", userRoom)
     this.room.getRoomById(userRoom.roomId).subscribe((response) => {
       if(response.success){
         let roomData = {
@@ -75,5 +78,16 @@ export class AppComponent implements OnInit{
       }
     })
     this.userRoom = userRoom
+  }
+
+  UserRooms(){
+    this.socket.userRooms().subscribe(data => {
+      console.log("rooms", data)
+      data.forEach(data => {
+
+      })
+
+      this.socket.rooms.next(data)
+    })
   }
 }

@@ -85,6 +85,7 @@
         let userRoom of !searchText ? roomList : filteredRooms
       "
       (click)="conversationClicked.emit(userRoom)"
+      [routerLink]='["chat", userRoom.roomId]'
     >
       <div class="picture">
         <img src="../../assets/images/noPic.svg" />

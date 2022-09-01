@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import * as io from 'socket.io-client';
-import { Observable, Observer } from 'rxjs';
+import { Observable, Observer, Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 
@@ -9,6 +9,8 @@ import { environment } from 'src/environments/environment';
 })
 export class SocketService {
   socket = io.io(environment.socketUrl, {transports: ['websocket'], upgrade: false})
+  messages = new Subject()
+  rooms = new Subject()
   constructor() { }
 
   // emit event
@@ -46,6 +48,7 @@ export class SocketService {
   }
 getRoomMessage(){
   return new Observable((observer:Observer<any>) => {
+    console.log("here I am")
     this.socket.on('message', (data) => {
       observer.next(data)
     })
@@ -54,8 +57,15 @@ getRoomMessage(){
   createRoom(data){
     this.socket.emit('joinRoom', (data))
   }
-  userRooms(data){
-    this.socket.emit('userRooms', data);
+  getUserRooms(data){
+    this.socket.emit('getUserRooms', data);
+  }
+  userRooms(){
+    return new Observable((observer:Observer<any>) => {
+      this.socket.on('userRooms', (data) => {
+        observer.next(data)
+      })
+    })
   }
 
   socketDisconnect(){

@@ -4,11 +4,12 @@ import { LoginComponent } from './login/login.component';
 import {AppComponent} from './app.component';
 import {AuthGuard} from './services/auth.guard';
 import { ChatComponent } from './chat/chat.component';
+import { PrivateRoomResolver } from './private-room.resolver';
 
 const routes: Routes = [
   {path: '', component: AppComponent, canActivate: [AuthGuard]},
   {path:'login', component: LoginComponent},
-  {path:'chat', component:ChatComponent, canActivate: [AuthGuard]},
+  {path:'chat/:roomId', component:ChatComponent, resolve:{room:PrivateRoomResolver}, canActivate: [AuthGuard]},
 ];
 
 @NgModule({

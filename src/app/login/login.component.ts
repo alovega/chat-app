@@ -69,7 +69,7 @@ export class LoginComponent implements OnInit {
           this.router.navigate([''])
           console.log(response)
           this.socket.userSocket({userId:response.payload.id, username:response.payload.user.username})
-          this.socket.userRooms({userId:response.payload.id, username:response.payload.user.username})
+          this.socket.getUserRooms({userId:response.payload.id, username:response.payload.user.username})
           sessionStorage.setItem('token', `${response.authorization}`)
           sessionStorage.setItem('username',`${response.payload.user.username}`)
           sessionStorage.setItem('userId', `${response.payload.id}`)

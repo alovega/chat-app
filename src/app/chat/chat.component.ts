@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 import { ChatroomService } from '../services/chatroom.service';
 import { SocketService } from '../services/socket.service';
@@ -7,18 +8,36 @@ import { SocketService } from '../services/socket.service';
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.scss'],
 })
-export class ChatComponent implements OnInit, OnChanges{
+export class ChatComponent implements OnInit{
   @Input() user;
-  @Input() userRoom;
+  userRoom:any  = {};
   @Output() onSubmit: EventEmitter<any> = new EventEmitter();
   emojiPickerVisible;
   messageList: {message:string, username:string, mine:boolean, time:string}[] = [];
   message = '';
-  constructor(private chatService: ChatroomService, private socket: SocketService) {}
-  ngOnInit(): void {
+  constructor(private chatService: ChatroomService, private socket: SocketService, private activatedRoute: ActivatedRoute) {
+    this.socket.messages.subscribe((res: any) =>{
+      this.messageList.push(res)
+    })
+    this.getRoomMessage()
   }
-  ngOnChanges(changes: SimpleChanges): void {
-    this.getMessage()
+  ngOnInit(): void {
+    this.activatedRoute.data.subscribe(({room}) => {
+      const data = room.payload
+      let roomData={
+        roomId: data.id,
+        recipientId: data.recipientId,
+        initiatorId: data.profileId,
+        initiator: data.chatInitiator.user.username,
+        recipient: data.recipient.user.username,
+        messages: data.chatMessage,
+        username: sessionStorage.getItem('username'),
+        name: sessionStorage.getItem('username') === data.recipient.user.username ? data.chatInitiator.user.username: data.recipient.user.username
+      }
+      this.messageList = data.chatMessage
+      this.userRoom = roomData
+      this.socket.createRoom(roomData)
+    })
   }
 
   get_or_create(data){
@@ -54,32 +73,18 @@ export class ChatComponent implements OnInit, OnChanges{
   emojiClicked(event) {
     this.message += event.emoji.native;
   }
-  getMessage(){
-    this.socket.getMessage().subscribe((data:{message:string, username:string, time:string}) => {
-      if(data){
-        console.log('current', this.user)
-        console.log('messages', data)
-        console.log(this.messageList)
-        this.messageList.push({
-          message: data.message, 
-          username:data.username, 
-          mine:this.user.username===data.username ? true: false, 
-          time:data.time})
-      }
-    }) 
-  }
 
   getRoomMessage(){
     this.socket.getRoomMessage().subscribe((data:{message:string, username:string, time:string}) => {
+      console.log("hello???")
+      console.log(data)
       if(data){
-        console.log('current', this.user)
-        console.log('messages', data)
-        console.log(this.messageList)
-        this.messageList.push({
-          message: data.message, 
-          username:data.username, 
-          mine:this.user.username===data.username ? true: false, 
-          time:data.time})
+          let message = {
+            message: data.message, 
+            username:data.username, 
+            mine:sessionStorage.username===data.username ? true: false, 
+            time:data.time}
+        this.socket.messages.next(message)
       }
     })
   }
