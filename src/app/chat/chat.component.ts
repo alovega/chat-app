@@ -31,12 +31,14 @@ export class ChatComponent implements OnInit{
         initiator: data.chatInitiator.user.username,
         recipient: data.recipient.user.username,
         messages: data.chatMessage,
+        userId:sessionStorage.getItem('userId'),
         username: sessionStorage.getItem('username'),
         name: sessionStorage.getItem('username') === data.recipient.user.username ? data.chatInitiator.user.username: data.recipient.user.username
       }
       this.messageList = data.chatMessage
       this.userRoom = roomData
       this.socket.createRoom(roomData)
+      this.socket.getUserRooms({userId: sessionStorage.getItem('userId')})
     })
   }
 

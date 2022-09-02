@@ -1,7 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthService } from '../services/auth.service';
-import { ChatroomService } from '../services/chatroom.service';
 
 import { SocketService } from '../services/socket.service';
 
@@ -44,7 +42,8 @@ export class SidebarComponent implements OnInit {
    this.isShown = !this.isShown
 }
 
-  constructor(private router: Router, private socketService: SocketService) {}
+  constructor(private router: Router, private socketService: SocketService) {
+  }
     ngOnInit(): void {
       this.socketService.onOnlineUsers().subscribe(data =>{
         this.users = data.filter(data =>data.username !== sessionStorage.getItem('username'))
